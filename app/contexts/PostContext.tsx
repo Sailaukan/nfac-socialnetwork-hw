@@ -1,6 +1,5 @@
 'use client'
 
-
 //HERE IS THE CONTEXT API USING EXAMPLE. It really works, don't worry
 
 import { Dispatch, ReactNode, SetStateAction, createContext, useState } from 'react';
