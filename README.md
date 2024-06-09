@@ -24,4 +24,4 @@ This repository contains a homework project for the nFactorial Incubator program
 1. Clone the repository:
 
    ```bash
-   git clone [https://github.com/yourusername/social-media-homework](https://github.com/Sailaukan/nfac-socialnetwork-hw).git
+   git clone https://github.com/Sailaukan/nfac-socialnetwork-hw.git
