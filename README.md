@@ -13,7 +13,7 @@ This repository contains a homework project for the nFactorial Incubator program
 - Context API: Manage global state efficiently.
 - Axios Interceptors: Handle requests and responses globally.
 
-## Video Demostration
+## Video Demonstration
 
 [YouTube Video](https://youtu.be/O0qHeXfAzAM?si=BB9KbgiOsEfxno_d)
 
