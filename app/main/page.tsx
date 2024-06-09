@@ -4,8 +4,10 @@ import Link from 'next/link';
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import Post from '../components/Post';
+import axiosInstance from '../lib/axios';
 import { PostType } from '../type/post';
 import { UserContext } from '../contexts/PostContext';
+import { UserPost } from '../components/UserPost';
 
 
 interface AuthResponse {
@@ -14,44 +16,77 @@ interface AuthResponse {
     email: string;
 }
 
-// {localStorage.getItem('token')}
+interface UserPostType {
+    title: string
+    username: string
+}
+
 
 function PostsList() {
     const [posts, setPosts] = useState<PostType[]>([]);
-    const [error, setError] = useState<string | null>(null);
+    const [userPosts, setUserPosts] = useState<UserPostType[]>([]);
+    const [error, setError] = useState<any | null>(null);
     const { user, setUser } = useContext(UserContext);
-
+    const [newPost, setNewPost] = useState<string | null>("")
 
     useEffect(() => {
-        axios.get('https://dummyjson.com/posts')
-            .then(response => setPosts(response.data.posts))
-            .catch(error => setError(error));
-    }, []);
+        const fetchPosts = async () => {
+            try {
+                const response = await axiosInstance.get('/posts');
+                setPosts(response.data.posts);
+            } catch (error) {
+                setError('An error occurred while fetching posts.');
+            }
+        };
+        fetchPosts();
+    }, [posts]);
 
 
+    //HERE IS THE INTERCEPTOR EXAMPLE
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get<AuthResponse>('https://dummyjson.com/auth/me', {
-                    headers: {
-                        'Authorization': `Bearer ${user.token}`,
-                    },
-                });
+                const response = await axiosInstance.get<AuthResponse>('/auth/me');
                 console.log(response.data);
                 if (response.data) {
                     setUser({
                         ...user,
-                        isAuth: true
-                    })
+                        name: response.data.username,
+                        isAuth: true,
+                        id: response.data.id
+                    });
                 }
             }
             catch (error) {
-                console.log(user.token)
+                console.log(user.token);
+                setError(error)
                 console.error('Error fetching data:', error);
             }
         };
         fetchData();
     }, []);
+
+    const handleNameChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setNewPost(event.target.value);
+    };
+
+    const publishPost = async () => {
+        try {
+            const response = await axiosInstance.post('/posts/add', {
+                title: newPost,
+                userId: user.id,
+            });
+            const result = response.data;
+            console.log(result);
+
+            setUserPosts([result, ...userPosts]);
+
+            setNewPost("");
+        } catch (error) {
+            console.error('Error publishing post:', error);
+            setError('An error occurred while publishing the post.');
+        }
+    };
 
     if ({ error }) {
         <div className="flex h-[100dvh] w-full flex-col items-center justify-center bg-gradient-to-br from-[#6366F1] to-[#EC4899] p-4">
@@ -86,7 +121,32 @@ function PostsList() {
 
     return (
         <div className="container mx-auto px-4 py-8 md:px-2 lg:py-3">
+
+            <div className={`${!user.darkTheme ? 'bg-white' : 'bg-gray-800'} rounded-xl mb-8 shadow-lg p-6 max-w-md mx-auto`}>
+                <div className="flex flex-col gap-4">
+
+                    <p className='text-gray-400'>@{user.name}</p>
+                    <div>
+                        <textarea
+                            onChange={handleNameChange}
+                            className="flex min-h-[80px] bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full resize-none rounded-xl border border-gray-200 dark:border-gray-800 p-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="What's on your mind?"
+                        ></textarea>
+                    </div>
+                    <div className="flex justify-right">
+                        <button onClick={publishPost} className="inline-flex items-center justify-center whitespace-nowrap text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-xl">
+                            Publish
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {userPosts && userPosts.map(post => (
+                    <UserPost
+                        title={post.title}
+                    />
+                ))}
                 {posts && posts.map(post => (
                     <Post
                         key={post.id}

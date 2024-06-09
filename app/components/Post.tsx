@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Link from 'next/link';
+import UserProvider, { UserContext } from '../contexts/PostContext';
 
 interface IPost {
     title: string,
@@ -13,14 +14,16 @@ interface IPost {
 
 function Post({ title, views, likes, dislikes, tags, path }: IPost) {
 
+    const { user, setUser } = useContext(UserContext);
+
     return (
         <Link href={path}>
             <div className="container mx-auto px-4 md:px-6 py-2">
-                <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-4 md:p-6" data-v0-t="card">
+                <div className={`rounded-lg border bg-card text-card-foreground shadow-sm p-4 md:p-6 ${user.darkTheme ? 'bg-gray-800' : 'bg-white'}`} data-v0-t="card">
                     <div className="flex items-start gap-4">
                         <div className="grid gap-2 flex-1">
                             <div className="flex items-center justify-between">
-                                <h3 className="font-semibold">{title}</h3>
+                                <h3 className={`font-semibold ${user.darkTheme ? 'text-white' : 'text-black'}`}>{title}</h3>
                             </div>
                             <div className="flex items-center gap-4">
                                 <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
@@ -81,7 +84,7 @@ function Post({ title, views, likes, dislikes, tags, path }: IPost) {
                                 {tags.map((tag, index) => (
                                     <div
                                         key={index}
-                                        className="inline-flex items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                                        className={`${user.darkTheme ? 'text-white' : 'text-black'} inline-flex items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80`}
                                         data-v0-t="badge"
                                     >
                                         {tag}
