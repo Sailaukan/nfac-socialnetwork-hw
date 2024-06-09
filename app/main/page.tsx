@@ -1,19 +1,56 @@
 'use client'
 
 import Link from 'next/link';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import Post from '../components/Post';
 import { PostType } from '../type/post';
+import { UserContext } from '../contexts/PostContext';
+
+
+interface AuthResponse {
+    id: number;
+    username: string;
+    email: string;
+}
+
+// {localStorage.getItem('token')}
 
 function PostsList() {
     const [posts, setPosts] = useState<PostType[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const { user, setUser } = useContext(UserContext);
+
 
     useEffect(() => {
         axios.get('https://dummyjson.com/posts')
             .then(response => setPosts(response.data.posts))
             .catch(error => setError(error));
+    }, []);
+
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get<AuthResponse>('https://dummyjson.com/auth/me', {
+                    headers: {
+                        'Authorization': `Bearer ${user.token}`,
+                    },
+                });
+                console.log(response.data);
+                if (response.data) {
+                    setUser({
+                        ...user,
+                        isAuth: true
+                    })
+                }
+            }
+            catch (error) {
+                console.log(user.token)
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
     }, []);
 
     if ({ error }) {
@@ -34,6 +71,18 @@ function PostsList() {
         </div>
     }
 
+    if (!localStorage.getItem('isAuth') || localStorage.getItem('isAuth') === 'false') {
+        return (
+            <div className="flex h-screen w-full items-center justify-center bg-gradient-to-r from-[#6366F1] to-[#EC4899] p-4">
+                <div className="rounded-lg bg-white/80 p-6 backdrop-blur-sm dark:bg-gray-900/80">
+                    <h1 className="bg-gradient-to-r from-[#6366F1] to-[#EC4899] bg-clip-text text-3xl font-bold text-transparent">
+                        To see posts, please
+                        <a href="/profile" className='text-white hover:opacity-60'> Sign In</a>
+                    </h1>
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div className="container mx-auto px-4 py-8 md:px-2 lg:py-3">

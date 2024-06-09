@@ -6,15 +6,16 @@ import { UserContext } from '../contexts/PostContext';
 
 interface User {
     name: string;
+    email: string;
     password: string;
     token: string;
 }
 
- 
 const Login = () => {
-    const {setUser} = useContext(UserContext); 
+    const { user, setUser } = useContext(UserContext);
+    const [error, setError] = useState(false)
 
-    const [newUser, setNewUser] = useState<User>({ name: '', password: '', token:'' });
+    const [newUser, setNewUser] = useState<User>({ name: '', email:'', password: '', token: '' });
 
     const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setNewUser({ ...newUser, name: event.target.value });
@@ -27,6 +28,10 @@ const Login = () => {
     const handleSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         getToken()
+    };
+
+    const handleSignOut = (event: React.MouseEvent<HTMLButtonElement>) => {
+        localStorage.setItem('isAuth', 'false')
     };
 
     const getToken = () => {
@@ -42,22 +47,53 @@ const Login = () => {
             .then(response => {
                 console.log(response.data);
                 setNewUser({ ...newUser, token: response.data.token });
+                localStorage.setItem('token', response.data.token);
+                localStorage.setItem('isAuth', 'true');
+                setError(false)
             })
             .catch(error => {
                 console.log(error);
+                setError(true)
             });
     }
 
-    useEffect(()=>{
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            setUser({ ...user, token, isAuth: true });
+        }
+    }, []);
+
+    useEffect(() => {
         setUser({
+            ...user,
             name: newUser.name,
             password: newUser.password,
-            token: newUser.token
         })
         console.log(newUser.token);
-    },[newUser])
+    }, [newUser.token])
 
-    return (
+    if (localStorage.getItem('isAuth') === 'true') {
+        return (
+            <center>
+                <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 w-full max-w-md animate-fade-in">
+                    <div className="flex flex-col items-center mb-6">
+                        <span className="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full mb-4 animate-bounce">
+                            <img className="aspect-square h-full w-full" alt="User Avatar" src="/placeholder-user.jpg" />
+                        </span>
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 animate-fade-in-up">{user.name}</h1>
+                    </div>
+                    <div className="flex justify-end">
+                        <button onClick={handleSignOut} className="bg-white inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-secondary text-secondary-foreground hover:bg-secondary/80 h-10 px-4 py-2">
+                            Sign Out
+                        </button>
+                    </div>
+                </div>
+            </center>
+        )
+    }
+
+    else if (!localStorage.getItem('isAuth') || localStorage.getItem('isAuth') === 'false') return (
         <center>
             <div className="flex flex-col w-full max-w-md px-4 py-8 bg-white rounded-lg shadow dark:bg-gray-800 sm:px-6 md:px-8 lg:px-10">
                 <div className="self-center mt-4 text-xl font-light text-gray-600 sm:text-2xl dark:text-white">
@@ -96,6 +132,12 @@ const Login = () => {
                             </button>
                         </div>
                     </form>
+                    {error ?
+                        <div className="text-white">
+                            Wrong username or password
+                        </div>
+                        :
+                        null}
                 </div>
             </div>
         </center>

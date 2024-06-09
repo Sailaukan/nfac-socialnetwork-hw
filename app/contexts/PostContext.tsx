@@ -6,6 +6,7 @@ export type User = {
     name: string;
     password: string;
     token: string;
+    isAuth: boolean;
 }
 
 export interface UserContextInterface {
@@ -18,6 +19,7 @@ const defaultUserState ={
         name:'',
         password: '',
         token:'',
+        isAuth: false
     },
     setUser: (user: User) => {}
 } as UserContextInterface 
@@ -33,7 +35,8 @@ export default function UserProvider({children}: UserProvideProps) {
     const[user, setUser]= useState<User>({
         name: '',
         password: '',
-        token: ''
+        token: '',
+        isAuth: false,
     });
 
     const value = { user, setUser };
