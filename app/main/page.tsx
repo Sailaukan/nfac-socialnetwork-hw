@@ -7,7 +7,7 @@ import Post from '../components/Post';
 import axiosInstance from '../lib/axios';
 import { PostType } from '../type/post';
 import { UserContext } from '../contexts/PostContext';
-import { UserPost } from '../components/UserPost';
+import UserPost from '../components/UserPost';
 
 
 interface AuthResponse {
@@ -20,7 +20,6 @@ interface UserPostType {
     title: string
     username: string
 }
-
 
 function PostsList() {
     const [posts, setPosts] = useState<PostType[]>([]);
@@ -40,7 +39,6 @@ function PostsList() {
         };
         fetchPosts();
     }, [posts]);
-
 
     //HERE IS THE INTERCEPTOR EXAMPLE
     useEffect(() => {
@@ -121,10 +119,8 @@ function PostsList() {
 
     return (
         <div className="container mx-auto px-4 py-8 md:px-2 lg:py-3">
-
             <div className={`${!user.darkTheme ? 'bg-white' : 'bg-gray-800'} rounded-xl mb-8 shadow-lg p-6 max-w-md mx-auto`}>
                 <div className="flex flex-col gap-4">
-
                     <p className='text-gray-400'>@{user.name}</p>
                     <div>
                         <textarea
@@ -144,7 +140,10 @@ function PostsList() {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {userPosts && userPosts.map(post => (
                     <UserPost
+                        key={post.title}
                         title={post.title}
+                        userPosts={userPosts}
+                        setUserPosts={setUserPosts}
                     />
                 ))}
                 {posts && posts.map(post => (

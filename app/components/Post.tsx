@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import Link from 'next/link';
-import UserProvider, { UserContext } from '../contexts/PostContext';
+import { UserContext } from '../contexts/PostContext';
 
 interface IPost {
     title: string,
