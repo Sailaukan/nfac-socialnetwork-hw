@@ -16,7 +16,7 @@ const Login = () => {
     const [error, setError] = useState(false)
     const [useEffectTrigger, setUseEffectTrigger] = useState(0)
 
-    const [newUser, setNewUser] = useState<User>({ name: '', email:'', password: '', token: ''});
+    const [newUser, setNewUser] = useState<User>({ name: '', email: '', password: '', token: '' });
 
     const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setNewUser({ ...newUser, name: event.target.value });
@@ -29,7 +29,7 @@ const Login = () => {
     const handleSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         getToken()
-        setUseEffectTrigger(useEffectTrigger+1);
+        setUseEffectTrigger(useEffectTrigger + 1);
 
         setUser({
             ...user,
@@ -40,8 +40,11 @@ const Login = () => {
     };
 
     const handleSignOut = (event: React.MouseEvent<HTMLButtonElement>) => {
-        localStorage.setItem('isAuth', 'false');
-        setUseEffectTrigger(useEffectTrigger+1);
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('isAuth', 'false')
+        };
+
+        setUseEffectTrigger(useEffectTrigger + 1);
     };
 
     const getToken = () => {
@@ -57,8 +60,10 @@ const Login = () => {
             .then(response => {
                 console.log(response.data);
                 setNewUser({ ...newUser, token: response.data.token });
-                localStorage.setItem('token', response.data.token);
-                localStorage.setItem('isAuth', 'true');
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem('token', response.data.token);
+                    localStorage.setItem('isAuth', 'true');
+                };
                 setError(false)
             })
             .catch(error => {
@@ -68,13 +73,17 @@ const Login = () => {
     }
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            setUser({ ...user, token, isAuth: true });
+
+        if (typeof window !== 'undefined') {
+            const token = localStorage.getItem('token');
+
+            if (token) {
+                setUser({ ...user, token, isAuth: true });
+            }
         }
     }, [useEffectTrigger]);
 
-    if (localStorage.getItem('isAuth') === 'true') {
+    if ((localStorage.getItem('isAuth') === 'true') && (typeof window !== 'undefined')) {
         return (
             <center>
                 <div className={`${user.darkTheme ? 'bg-gray-800' : 'bg-white'} shadow-lg rounded-lg p-8 w-full max-w-md animate-fade-in`}>
@@ -94,7 +103,7 @@ const Login = () => {
         )
     }
 
-    else if (!localStorage.getItem('isAuth') || localStorage.getItem('isAuth') === 'false') return (
+    else if ((!localStorage.getItem('isAuth') || localStorage.getItem('isAuth') === 'false')&& (typeof window !== 'undefined') ) return (
         <center>
             <div className={`flex flex-col w-full max-w-md px-4 py-8 ${user.darkTheme ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow sm:px-6 md:px-8 lg:px-10`}>
                 <p className={` ${user.darkTheme ? 'text-white' : 'text-black'} self-center mt-4  `}>

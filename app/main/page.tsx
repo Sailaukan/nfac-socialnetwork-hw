@@ -104,7 +104,7 @@ function PostsList() {
         </div>
     }
 
-    if (!localStorage.getItem('isAuth') || localStorage.getItem('isAuth') === 'false') {
+    if ((!localStorage.getItem('isAuth') || localStorage.getItem('isAuth') === 'false') && typeof window !== 'undefined') {
         return (
             <div className="flex h-screen w-full items-center justify-center bg-gradient-to-r from-[#6366F1] to-[#EC4899] p-4">
                 <div className="rounded-lg bg-white/80 p-6 backdrop-blur-sm dark:bg-gray-900/80">
