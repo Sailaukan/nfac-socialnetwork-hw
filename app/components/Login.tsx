@@ -83,7 +83,7 @@ const Login = () => {
         }
     }, [useEffectTrigger]);
 
-    if ((localStorage.getItem('isAuth') === 'true') && (typeof window !== 'undefined')) {
+    if ((typeof window !== 'undefined') && (localStorage.getItem('isAuth') === 'true')) {
         return (
             <center>
                 <div className={`${user.darkTheme ? 'bg-gray-800' : 'bg-white'} shadow-lg rounded-lg p-8 w-full max-w-md animate-fade-in`}>
@@ -103,7 +103,7 @@ const Login = () => {
         )
     }
 
-    else if ((!localStorage.getItem('isAuth') || localStorage.getItem('isAuth') === 'false')&& (typeof window !== 'undefined') ) return (
+    else if ( (typeof window !== 'undefined') && (!localStorage.getItem('isAuth') || localStorage.getItem('isAuth') === 'false') ) return (
         <center>
             <div className={`flex flex-col w-full max-w-md px-4 py-8 ${user.darkTheme ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow sm:px-6 md:px-8 lg:px-10`}>
                 <p className={` ${user.darkTheme ? 'text-white' : 'text-black'} self-center mt-4  `}>

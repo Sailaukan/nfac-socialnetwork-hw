@@ -1,5 +1,3 @@
-'use client'
-
 import axios from 'axios';
 
 const axiosInstance = axios.create({
@@ -10,7 +8,7 @@ const axiosInstance = axios.create({
 //HERE IS THE INTERCEPTOR EXAMPLE
 axiosInstance.interceptors.request.use(
     config => {
-        config.headers['Authorization'] = `Bearer ${typeof window !== 'undefined' ? localStorage.getItem('token') : ''}`;
+        config.headers['Authorization'] = `Bearer ${typeof window !== 'undefined' ? window.localStorage.getItem('token') : ''}`;
 
         return config;
     },
